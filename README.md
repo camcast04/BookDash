@@ -46,6 +46,8 @@ GIF created with ...
 
 Describe any challenges encountered while building the app.
 
+I had trouble with my API I think its a very large API and loads slowly / loses connection
+
 ## License
 
     Copyright [2023] [Camila Castaneda]
