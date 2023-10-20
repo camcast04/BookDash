@@ -13,7 +13,7 @@ The following **required** functionality is completed:
 - [x] **The list displays a list of data fetched using an API call**
 - [x] **Data uses the useEffect React hook and async/await syntax**
 - [x] **The app dashboard includes at least three summary statistics about the data such as**
-  - [ ] _insert details_
+  - [x] _insert details_ (Number of fiction, number of books)
 - [x] **A search bar allows the user to search for an item in the fetched data**
 - [x] **Multiple different filters (2+) allow the user to filter items in the database by specified categories**
 
