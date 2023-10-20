@@ -37,23 +37,27 @@ function App() {
     let matchesGenre = true; // default to true for 'all' genre
     if (selectedGenre === 'fiction') {
       matchesGenre =
-        book.title.toLowerCase().includes('fiction') ||
-        (book.author_name &&
-          book.author_name.some((name) =>
-            name.toLowerCase().includes('fiction')
-          ));
+        book.title.toLowerCase().includes('fiction') &&
+        !book.title.toLowerCase().includes('non-fiction');
     } else if (selectedGenre === 'non-fiction') {
-      matchesGenre =
-        !book.title.toLowerCase().includes('fiction') &&
-        (!book.author_name ||
-          !book.author_name.some((name) =>
-            name.toLowerCase().includes('fiction')
-          ));
+      matchesGenre = book.title.toLowerCase().includes('non-fiction');
     }
 
     return matchesSearchTerm && matchesGenre;
   });
 
+  // Calculate the number of fiction and non-fiction books
+  const fictionBooks = books.filter((book) =>
+    book.title.toLowerCase().includes('fiction')
+  );
+  const nonFictionBooks = books.filter(
+    (book) => !book.title.toLowerCase().includes('fiction')
+  );
+
+  const totalFictionBooks = fictionBooks.length;
+  const totalNonFictionBooks = nonFictionBooks.length;
+
+  ////
   return (
     <div className="container">
       <div className="sidebar">
@@ -65,6 +69,9 @@ function App() {
       <div className="main-content">
         <Header />
         <SummaryStats books={filteredBooks} />
+        {/* Additional summary stats */}
+        <div>Total Fiction Books: {totalFictionBooks}</div>
+        <div>Total Non-Fiction Books: {totalNonFictionBooks}</div>
         <DataList books={filteredBooks} />
       </div>
     </div>
