@@ -1,0 +1,52 @@
+body {
+  font-family: Arial, sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #2a2a44, #1e1e33);
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 400px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px 20px 20px 40px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.sidebar a {
+  color: #fff;
+  display: block;
+  margin-bottom: 10px;
+  text-decoration: none;
+  width: 100%;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  padding: 20px 20px 20px 40px;
+  background: rgba(0, 0, 0, 0.4);
+  margin-left: 100px;
+}
+
+.main-content h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.sidebar h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
