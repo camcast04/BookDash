@@ -27,7 +27,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<iframe class="imgur-embed" width="100%" height="1080" frameborder="0" src="https://i.imgur.com/p180ayM.gifv#embed"></iframe>
+<img src='https://i.imgur.com/p180ayM.gifv' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 <!-- Replace this with whatever GIF tool you used! -->
 
