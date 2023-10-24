@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import Filters from './components/Filters';
@@ -14,16 +14,39 @@ function App() {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [error, setError] = useState(null);
 
+  const [statistics, setStatistics] = useState({
+    totalEditions: 0,
+    earliestPublication: null,
+    latestPublication: null,
+  });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const url = `https://openlibrary.org/search.json?q=${searchTerm}`;
-        console.log('Fetching URL:', url);
+        const url = `https://openlibrary.org/search.json?q=${searchTerm}&limit=100`;
         const response = await fetch(url);
         const data = await response.json();
+
+        let totalEditions = 0;
+        let earliestPub = Infinity;
+        let latestPub = -Infinity;
+
+        data.docs.forEach((book) => {
+          totalEditions += book.edition_count;
+          if (book.first_publish_year) {
+            earliestPub = Math.min(earliestPub, book.first_publish_year);
+            latestPub = Math.max(latestPub, book.first_publish_year);
+          }
+        });
+
+        setStatistics({
+          totalEditions,
+          earliestPublication: earliestPub === Infinity ? null : earliestPub,
+          latestPublication: latestPub === -Infinity ? null : latestPub,
+        });
+
         setBooks(data.docs);
       } catch (error) {
-        console.error('Error fetching data:', error);
         setError(error);
       }
     };
@@ -33,22 +56,12 @@ function App() {
     }
   }, [searchTerm]);
 
-  const filteredBooks = books.filter((book) => {
-    let matchesSearchTerm = book.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-    let matchesGenre = true;
-    if (selectedGenre === 'fiction') {
-      matchesGenre =
-        book.title.toLowerCase().includes('fiction') &&
-        !book.title.toLowerCase().includes('non-fiction');
-    } else if (selectedGenre === 'non-fiction') {
-      matchesGenre = book.title.toLowerCase().includes('non-fiction');
-    }
-
-    return matchesSearchTerm && matchesGenre;
-  });
+  let filteredBooks = books;
+  if (selectedGenre !== 'all') {
+    filteredBooks = books.filter((book) =>
+      book.title.toLowerCase().includes(selectedGenre)
+    );
+  }
 
   if (error) {
     return <div>Error occurred: {error.message}</div>;
@@ -58,10 +71,10 @@ function App() {
     <Router>
       <div className="container">
         <div className="sidebar">
-          <h1>📚 Book Dash</h1>
-          <Link to="/">Dashboard</Link>
+          <Header />
           <SearchBar setSearchTerm={setSearchTerm} />
           <Filters setSelectedGenre={setSelectedGenre} />
+          {/* Add any other links or components you want in the sidebar here */}
         </div>
         <div className="main-content">
           <Routes>
@@ -69,24 +82,7 @@ function App() {
               path="/"
               element={
                 <>
-                  <Header />
-                  <SummaryStats books={filteredBooks} />
-                  <div>
-                    Total Fiction Books:{' '}
-                    {
-                      filteredBooks.filter((book) =>
-                        book.title.toLowerCase().includes('fiction')
-                      ).length
-                    }
-                  </div>
-                  <div>
-                    Total Non-Fiction Books:{' '}
-                    {
-                      filteredBooks.filter(
-                        (book) => !book.title.toLowerCase().includes('fiction')
-                      ).length
-                    }
-                  </div>
+                  <SummaryStats books={filteredBooks} statistics={statistics} />
                   <DataList books={filteredBooks} />
                 </>
               }
