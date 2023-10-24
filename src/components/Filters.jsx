@@ -5,7 +5,6 @@ function Filters({ setSelectedGenre }) {
         <option value="all">All Genres</option>
         <option value="fiction">Fiction</option>
         <option value="non-fiction">Non-Fiction</option>
-        {/* ... add other genres as needed */}
       </select>
     </div>
   );

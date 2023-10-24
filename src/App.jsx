@@ -1,40 +1,44 @@
 import './App.css';
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Header from './components/Header';
 import SearchBar from './components/SearchBar';
 import Filters from './components/Filters';
 import SummaryStats from './components/SummaryStats';
 import DataList from './components/DataList';
+import BookDetail from './components/BookDetail';
 
 function App() {
   const [books, setBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `https://openlibrary.org/search.json?q=${searchTerm}`
-        );
+        const url = `https://openlibrary.org/search.json?q=${searchTerm}`;
+        console.log('Fetching URL:', url);
+        const response = await fetch(url);
         const data = await response.json();
         setBooks(data.docs);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError(error);
       }
     };
 
-    if (searchTerm) {
+    if (searchTerm.trim()) {
       fetchData();
     }
   }, [searchTerm]);
 
   const filteredBooks = books.filter((book) => {
-    const matchesSearchTerm = book.title
+    let matchesSearchTerm = book.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
-    let matchesGenre = true; // default to true for 'all' genre
+    let matchesGenre = true;
     if (selectedGenre === 'fiction') {
       matchesGenre =
         book.title.toLowerCase().includes('fiction') &&
@@ -46,35 +50,52 @@ function App() {
     return matchesSearchTerm && matchesGenre;
   });
 
-  // Calculate the number of fiction and non-fiction books
-  const fictionBooks = books.filter((book) =>
-    book.title.toLowerCase().includes('fiction')
-  );
-  const nonFictionBooks = books.filter(
-    (book) => !book.title.toLowerCase().includes('fiction')
-  );
+  if (error) {
+    return <div>Error occurred: {error.message}</div>;
+  }
 
-  const totalFictionBooks = fictionBooks.length;
-  const totalNonFictionBooks = nonFictionBooks.length;
-
-  ////
   return (
-    <div className="container">
-      <div className="sidebar">
-        <h1>📚 Book Dash</h1>
-        <a href="#">Dashboard</a>
-        <SearchBar setSearchTerm={setSearchTerm} />
-        <Filters setSelectedGenre={setSelectedGenre} />
+    <Router>
+      <div className="container">
+        <div className="sidebar">
+          <h1>📚 Book Dash</h1>
+          <Link to="/">Dashboard</Link>
+          <SearchBar setSearchTerm={setSearchTerm} />
+          <Filters setSelectedGenre={setSelectedGenre} />
+        </div>
+        <div className="main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header />
+                  <SummaryStats books={filteredBooks} />
+                  <div>
+                    Total Fiction Books:{' '}
+                    {
+                      filteredBooks.filter((book) =>
+                        book.title.toLowerCase().includes('fiction')
+                      ).length
+                    }
+                  </div>
+                  <div>
+                    Total Non-Fiction Books:{' '}
+                    {
+                      filteredBooks.filter(
+                        (book) => !book.title.toLowerCase().includes('fiction')
+                      ).length
+                    }
+                  </div>
+                  <DataList books={filteredBooks} />
+                </>
+              }
+            />
+            <Route path="/book/:key" element={<BookDetail books={books} />} />
+          </Routes>
+        </div>
       </div>
-      <div className="main-content">
-        <Header />
-        <SummaryStats books={filteredBooks} />
-        {/* Additional summary stats */}
-        <div>Total Fiction Books: {totalFictionBooks}</div>
-        <div>Total Non-Fiction Books: {totalNonFictionBooks}</div>
-        <DataList books={filteredBooks} />
-      </div>
-    </div>
+    </Router>
   );
 }
 
